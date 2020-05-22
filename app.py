@@ -1,61 +1,70 @@
-import csv
-from datetime import datetime
-import datetime
-
-cols = 'Date,Open,High,Low,Close,Adj Close,Volume'.split(',')
-
-def load(filename):
-	data = []
-	with open(filename) as f:
-		f1 = csv.reader( f, delimiter=',')
-		for i in f1:
-			data.append(i)
-
-	return data
-
-
-def to_map(d):
-	r = {}
-	for i in d:
-		key = i[0]
-		value = i
-		r[key] = i
-	return r
-		
-
-def  get(key,data_row):
-	return data_row[ cols.index( key)]
-
-
-g_date = lambda  r:get( 'Date', r)
-g_open = lambda  r:get( 'Open', r)
-g_high = lambda  r:get( 'High', r)
-g_low = lambda  r:get( 'Low', r)
-g_close = lambda  r:get( 'Close', r)
-g_vol = lambda  r:get( 'Volume', r)
-	
-def transaction( historical_prices, buy_date, sell_date, qty):
-	buy_price = historical_prices.get[buy_date]  
-	sell_price = historical_prices.get[sell_date]  
-	return qty * (sell_price - buy_price)
-
-
-def to_date(d):
-	x = datetime.strptime( d, '%Y-%m-%d')
-	return x
+from data import Stock, Data
 
 
 
-a = load( 'RELIANCE.NS.all.csv')
-print( 'loaded ' , len(a), ' rows')
 
 
-b = to_map(a)
+BUY = 'buy'
+SELL = 'sell'
 
-dates = [x[0] for x in a]
-print( dates[0])
-print( dates[1])
-print( dates[-1])
+class Transaction:
+	def __init__(self, scrip, buy_sell, date, price, qty):
+		self.scrip = scrip
+		self.action = buy_sell
+		self.date = date
+		self.price = price
+		self.qty = qty
+
+	def tx_value(self):
+		amt = float(self.price) * self.qty
+		if self.action == BUY:
+			return - amt
+		return amt;
+
+class DCA :
+	def __init__(self):
+		self.ledger = []
+		self.d = Data()
+
+	def run( self, starting_year, num_years, amount):
+		#print( "Start" ,starting_year)
+		for y in range( num_years):
+			#print( starting_year + y)
+			for m in range( 1,13):
+				s = self.d.get_first_working_day( starting_year+ y,m)
+				if not s:
+					print ("Empty",y,m)
+
+				qty = int(amount/float(s.high))
+				#print( '\t',m, ':' , s.date, qty, 'at', s.high)
+				self.ledger.append( Transaction( 'Reliance', BUY,  s.date, s.high, qty))
+
+		sell = self.d.get_last_working_day( starting_year + num_years -1, 12)
+		total_qty = sum( [x.qty for x in self.ledger])
+		self.ledger.append( Transaction( 'Reliance', SELL,  sell.date, sell.low, total_qty))
+		#print( "End :", sell.date )
 
 
+	def maturity_value(self):
+		return ( sum( [x.tx_value() for x in self.ledger]))
 
+	def investment(self):
+		return sum([ float(x.price)*x.qty  for x in self.ledger if x.action == BUY])
+
+	def clear(self):
+		self.ledger = []
+
+
+num_years = 3
+starting  = 1996
+amount    = 10000
+
+dca = DCA()
+while starting < (2020-3):
+	dca.run( starting, num_years, amount)
+	f = dca.maturity_value()
+	i = dca.investment()
+	print( starting, num_years, amount, round(f,2), round(i,2) ,round(((f/i)*100),2))
+	dca.clear()
+
+	starting +=1

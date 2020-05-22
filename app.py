@@ -1,11 +1,7 @@
 from data import Stock, Data
 
-
-
-
-
-BUY = 'buy'
-SELL = 'sell'
+BUY 	= 'buy'
+SELL 	= 'sell'
 
 class Transaction:
 	def __init__(self, scrip, buy_sell, date, price, qty):
@@ -20,6 +16,40 @@ class Transaction:
 		if self.action == BUY:
 			return - amt
 		return amt;
+
+
+class Scenario():
+	def __init__(self, starting_year, num_years, amount, profit, investment):
+		self.d = {}
+		self.d['starting_year'] = starting_year
+		self.d['ending_year'] = starting_year + num_years -1
+		self.d['amount'] = amount
+		self.d['profit']  = profit
+		self.d['investment'] = investment
+		self.d['roi'] = round((self.get('profit')/ self.get('investment')) * 100,2)
+
+	def get(self,key):
+		a =  self.d.get(key,None)
+		if not a:
+			print(key)
+		return a
+
+	def to_str(self):
+		a=  """
+		starting_year: 		{}
+		ending_year: 		{}
+		amount: 		{}
+		profit: 		{}
+		investment: 		{}
+		roi: 			{}
+		""".format( self.get('starting_year'),
+					self.get('ending_year'),
+					self.get('amount'),
+					self.get('profit'),
+					self.get('investment'),
+					self.get('roi') )
+		return a
+
 
 class DCA :
 	def __init__(self):
@@ -49,22 +79,31 @@ class DCA :
 		return ( sum( [x.tx_value() for x in self.ledger]))
 
 	def investment(self):
-		return sum([ float(x.price)*x.qty  for x in self.ledger if x.action == BUY])
+		a = sum([ float(x.price)*x.qty  for x in self.ledger if x.action == BUY])
+		return a
 
 	def clear(self):
 		self.ledger = []
 
+	def simulate(self):
+		ret = []
+		num_years = 3
+		starting  = 1996
+		amount    = 10000
 
-num_years = 3
-starting  = 1996
-amount    = 10000
+		while starting < (2020-3):
+			self.run( starting, num_years, amount)
+			f = self.maturity_value()
+			i = self.investment()
+			print( starting, num_years, amount, round(f,2), round(i,2) ,round(((f/i)*100),2))
+			r = Scenario( starting, num_years, amount, round(f,2), round(i,2))
+			self.clear()
+			ret.append(r)
+			starting +=1
+		return ret
 
-dca = DCA()
-while starting < (2020-3):
-	dca.run( starting, num_years, amount)
-	f = dca.maturity_value()
-	i = dca.investment()
-	print( starting, num_years, amount, round(f,2), round(i,2) ,round(((f/i)*100),2))
-	dca.clear()
 
-	starting +=1
+a = DCA()
+b = a.simulate()
+for i in b:
+	print( i.to_str())

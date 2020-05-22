@@ -1,6 +1,4 @@
 import csv
-from datetime import datetime
-import sys
 
 class Stock:
 	def __init__(self,a):

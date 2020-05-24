@@ -1,4 +1,7 @@
 
+BUY 	= 'buy'
+SELL 	= 'sell'
+
 class Stock:
     def __init__(self,a):
         if 'null' in a:
@@ -9,14 +12,17 @@ class Stock:
         self.low 		= a[3]
         self.close 		= a[4]
         self.vol 		= a[5]
+    def to_s(self):
+        return  """({},{},{},{},{},{})""".format( self.date, self.open, self.high, self.low, self.close, self.vol )
+
     def to_str(self):
         a=  """
 		Date: 		{}
 		Open: 		{}
 		High: 		{}
-		Close: 		{}
-		Adjusted Close: {}
-		Volume: 		{}
+		Low: 		{}
+		Close:      {}
+		Volume: 	{}
 		""".format( self.date, self.open, self.high, self.low, self.close, self.vol )
         return a
 
@@ -33,17 +39,21 @@ class Transaction:
         amt = float(self.price) * self.qty
         if self.action == BUY:
             return - amt
-        return amt;
+        return amt
+
+    def to_str(self):
+        return  """({},{},{},{},{})""".format( self.scrip, self.action, self.date, self.price, self.qty)
 
 class Scenario():
-    def __init__(self, starting_year, num_years, amount, profit, investment):
+    def __init__(self, starting_year, num_months, amount, profit, investment, ledger):
         self.d = {}
-        self.d['starting_year'] = starting_year
-        self.d['ending_year'] = starting_year + num_years -1
-        self.d['amount'] = amount
-        self.d['profit']  = profit
-        self.d['investment'] = investment
-        self.d['roi'] = round((self.get('profit')/ self.get('investment')) * 100,2)
+        self.d['starting_year']     = starting_year
+        self.d['num_months']        = num_months
+        self.d['amount']            = amount
+        self.d['profit']            = profit
+        self.d['investment']        = investment
+        self.d['roi']               = round((self.get('profit')/ self.get('investment')) * 100,2)
+        self.d['ledger']            = ledger
 
     def get(self,key):
         a =  self.d.get(key,None)
@@ -52,17 +62,7 @@ class Scenario():
         return a
 
     def to_str(self):
-        a=  """
-		starting_year: 		{}
-		ending_year: 		{}
-		amount: 		{}
-		profit: 		{}
-		investment: 		{}
-		roi: 			{}
-		""".format( self.get('starting_year'),
-                    self.get('ending_year'),
-                    self.get('amount'),
-                    self.get('profit'),
-                    self.get('investment'),
-                    self.get('roi') )
-        return a
+        return  """ Return for Rs {} / {} months starting from {} is {}""".format(
+            self.get('amount'), self.get('num_months'), self.get('starting_year'), self.get('roi')
+        )
+

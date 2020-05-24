@@ -5,14 +5,17 @@ import csv
 from datetime import datetime
 import logging
 
+from models import Stock,Scenario,Transaction,BUY,SELL
+
+REL='RELIANCE.NS'
+
+#logging
 logging.basicConfig(filename="alpha.log",
                     format='%(asctime)s %(message)s',
                     filemode='w')
 logger=logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-
-from models import Stock,Scenario,Transaction
 
 def to_date(d):
     return datetime.strptime( d, '%Y-%m-%d')
@@ -75,18 +78,64 @@ for i in year_months.keys():
     year_months[i] = l
     logger.debug( " year-month key start:\n   {}  \nyear-month ey end ".format( ' '.join(year_months[i]) ))
 
-def get_first(year,month):
-    key = i.split('-')[0]+'_'+i.split('-')[1]
-    a = year_months.get( key, "YM Value not present")
+def get_first( year_month):
+    a = year_months.get( year_month, "YM Value not present")
     if a:
         return a[0]
     return None
 
-def get_last(year,month):
-    key = i.split('-')[0]+'_'+i.split('-')[1]
-    a = year_months.get( key, "YM Value not present")
+def get_last(year_month):
+    a = year_months.get( year_month, "YM Value not present")
     if a:
         return a[-1]
     return None
+
+ymsorter = lambda x : int(x.split('_')[0])*100 + int(x.split('_')[1])
+
+#data
+months = sorted( year_months.keys(), key = ymsorter)
+ledger = []
+
+
+
+
+def run_sim( scrip, a, amount, ledger):
+    net_buys = 0
+    for i in a:
+        f = get_first(i)
+        s = stocks.get(f)
+        qty = int(float(amount)/ float(s.high))
+        net_buys += qty
+        t0 = Transaction( scrip, BUY, s.date, s.high, qty)
+        ledger.append(t0)
+    a0 = get_last(a[-1])
+    s0 = stocks.get(a0)
+    t1 = Transaction( scrip, SELL, s0.date, s0.high, net_buys)
+    ledger.append(t1)
+    # for i in ledger:
+    #     print( i.to_str(), i.tx_value())
+    investment = sum([float(x.price) * x.qty for x in ledger if x.action == BUY])
+    sale = sum([ float(x.price) * x.qty for x in ledger if x.action == SELL])
+    profit = (sale-investment)
+    roi =  profit * 100  / investment
+    #print( "Roi for {} months starting {} is {}".format( len(a) , a[0], round( roi,2)))
+    scenario = Scenario(a[0], len(a), amount, profit, investment, ledger)
+    return scenario
+
+
+
+def simulation( scrip=REL, amount = 10000):
+    start = 0
+    batch_size = 12
+    scenarios = []
+    while start + batch_size < len(months):
+        a = months[ start:start + batch_size]
+        scenario = run_sim( scrip, a, amount, [])
+        scenarios.append( scenario)
+        start += 1
+    print( 'stopping sim at ',start,'+', batch_size, '/' ,len(months))
+    scenarios.sort( key  = lambda x : x.get('roi'))
+    for i in scenarios:
+        print( '::',i.to_str())
 
 

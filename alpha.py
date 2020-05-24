@@ -115,16 +115,20 @@ def run_sim( scrip, a, amount, ledger):
     # for i in ledger:
     #     print( i.to_str(), i.tx_value())
     investment = sum([float(x.price) * x.qty for x in ledger if x.action == BUY])
-    sale = sum([ float(x.price) * x.qty for x in ledger if x.action == SELL])
-    profit = (sale-investment)
-    roi =  profit * 100  / investment
+
+    sale = 0
+    profit = 0
+    roi = 0
+    if not investment == 0:
+        sale = sum([ float(x.price) * x.qty for x in ledger if x.action == SELL])
+        profit = (sale-investment)
+        roi =  round( (profit * 100 ) / investment ,2)
     #print( "Roi for {} months starting {} is {}".format( len(a) , a[0], round( roi,2)))
-    scenario = Scenario(a[0], len(a), amount, profit, investment, ledger)
+    scenario = Scenario(a[0], len(a), amount, profit, investment, ledger, roi)
     return scenario
 
 
-
-def simulation( scrip=REL, amount = 10000):
+def simulation( scrip=REL, amount = 1000):
     start = 0
     batch_size = 12
     scenarios = []

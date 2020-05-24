@@ -45,20 +45,20 @@ class Transaction:
         return  """({},{},{},{},{})""".format( self.scrip, self.action, self.date, self.price, self.qty)
 
 class Scenario():
-    def __init__(self, starting_year, num_months, amount, profit, investment, ledger):
+    def __init__(self, starting_year, num_months, amount, profit, investment, ledger, roi):
         self.d = {}
         self.d['starting_year']     = starting_year
         self.d['num_months']        = num_months
         self.d['amount']            = amount
         self.d['profit']            = profit
         self.d['investment']        = investment
-        self.d['roi']               = round((self.get('profit')/ self.get('investment')) * 100,2)
+        self.d['roi']               = roi
         self.d['ledger']            = ledger
 
     def get(self,key):
         a =  self.d.get(key,None)
-        if not a:
-            print(key)
+        #if not a:
+            #print('missing',key)
         return a
 
     def to_str(self):

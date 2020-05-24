@@ -57,13 +57,11 @@ class DCA :
 		self.d = Data()
 
 	def run( self, starting_year, num_years, amount):
-		#print( "Start" ,starting_year)
 		for y in range( num_years):
-			#print( starting_year + y)
 			for m in range( 1,13):
 				s = self.d.get_first_working_day( starting_year+ y,m)
 				if not s:
-					print ("Empty",y,m)
+					print ("Empty",y,m, starting_year)
 
 				qty = int(amount/float(s.high))
 				#print( '\t',m, ':' , s.date, qty, 'at', s.high)
@@ -85,11 +83,8 @@ class DCA :
 	def clear(self):
 		self.ledger = []
 
-	def simulate(self):
+	def simulate(self, starting, num_years, amount):
 		ret = []
-		num_years = 3
-		starting  = 1996
-		amount    = 10000
 
 		while starting < (2020-3):
 			self.run( starting, num_years, amount)
@@ -102,8 +97,9 @@ class DCA :
 			starting +=1
 		return ret
 
-
 a = DCA()
-b = a.simulate()
+b = a.dates[0].split('-')
+ym = b[0],b[1]
+b = a.simulate( y,3,10000)
 for i in b:
 	print( i.to_str())

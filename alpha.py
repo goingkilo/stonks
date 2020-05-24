@@ -94,10 +94,6 @@ ymsorter = lambda x : int(x.split('_')[0])*100 + int(x.split('_')[1])
 
 #data
 months = sorted( year_months.keys(), key = ymsorter)
-ledger = []
-
-
-
 
 def run_sim( scrip, a, amount, ledger):
     net_buys = 0
@@ -128,9 +124,8 @@ def run_sim( scrip, a, amount, ledger):
     return scenario
 
 
-def simulation( scrip=REL, amount = 1000):
+def simulation( scrip=REL, batch_size = 12, amount = 100000):
     start = 0
-    batch_size = 12
     scenarios = []
     while start + batch_size < len(months):
         a = months[ start:start + batch_size]
@@ -140,6 +135,7 @@ def simulation( scrip=REL, amount = 1000):
     print( 'stopping sim at ',start,'+', batch_size, '/' ,len(months))
     scenarios.sort( key  = lambda x : x.get('roi'))
     for i in scenarios:
+        # persist somewhere
         print( '::',i.to_str())
 
 

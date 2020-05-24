@@ -1,31 +1,10 @@
 import csv
 
-class Stock:
-	def __init__(self,a):
-		if 'null' in a:
-			return None
-		self.date		= a[0]
-		self.open 		= a[1]
-		self.high 		= a[2]
-		self.low 		= a[3]
-		self.close 		= a[4]
-		self.adjclose 	= a[5]
-		self.vol 		= a[6]
-	def to_str(self):
-		a=  """
-		Date: 		{}
-		Open: 		{}
-		High: 		{}
-		Close: 		{}
-		Adjusted Close: {}
-		Volume: 		{}
-		""".format( self.date, self.open, self.high, self.low, self.close, self.adjclose, self.vol )
-		return a
 
 
 class Data:
 
-	def __init__(self, filename='RELIANCE.NS.all.csv'):
+	def __init__(self, filename='yahoo_reliance_all.csv'):
 		self.data = {}
 		self.dates = []
 		self.year_month_data = {}

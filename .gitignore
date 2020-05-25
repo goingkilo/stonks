@@ -1,3 +1,4 @@
+virtualenv
 .idea
 *.log
 **/*.py.swp

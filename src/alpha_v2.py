@@ -13,7 +13,7 @@ def to_date(d):
     return datetime.strptime( d, '%Y-%m-%d')
 
 #logging
-logging.basicConfig(filename="alpha.log",
+logging.basicConfig(filename="../logs/alpha.log",
                     format='%(asctime)s %(message)s',
                     filemode='w')
 logger=logging.getLogger()
@@ -139,7 +139,7 @@ def simulation( d, scrip=REL, batch_size = 12, amount = 100000):
         scenarios.append( scenario)
         start += 1
     #print( 'stopping sim at ',start,'+', batch_size, '/' ,len(months))
-    scenarios.sort( key  = lambda x : x.get('roi'))
+    scenarios.sort( key  = lambda x : -x.get('roi'))
     # for i in scenarios:
     #     # persist somewhere
     #     print( '::',i.to_str())

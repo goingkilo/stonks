@@ -1,0 +1,49 @@
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+
+
+<div id="myfirstchart" style="height: 250px;"></div>
+
+
+<script>
+        function chart(data){
+            new Morris.Line({
+                element: 'myfirstchart',
+                data: data,
+                xkey: 'd.starting_year',
+                ykeys: ['d.roi'],
+                labels: ['d.Value']
+            });
+        }
+
+        function f(){
+            console.log('32');
+            $('#datamy').text('hello world');
+            jQuery.getJSON(
+                '/dca_roi_data',
+                function(data){
+                    $('#datamy').text(data[0].d.starting_year);
+                    b = data.map( function(x){ return x.d;});
+                    console.log( b[0]);
+
+                    new Morris.Line({
+                        element: 'myfirstchart',
+                        data: b,
+                        xkey: 'starting_year' ,
+                        ykeys: [ 'roi' ],
+                        labels: ['Roi']
+                    });
+                }
+            );
+        }
+        $(document).ready(f);
+
+</script>
+
+
+<div id="datamy"></div>

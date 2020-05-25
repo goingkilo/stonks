@@ -9,32 +9,19 @@
 
 <div id="myfirstchart" style="height: 250px;"></div>
 
-
 <script>
-        function chart(data){
-            new Morris.Line({
-                element: 'myfirstchart',
-                data: data,
-                xkey: 'd.starting_year',
-                ykeys: ['d.roi'],
-                labels: ['d.Value']
-            });
-        }
 
         function f(){
-            console.log('32');
-            $('#datamy').text('hello world');
             jQuery.getJSON(
-                '/dca_roi_data',
+                '/data/RELIANCE.NS/10000',
                 function(data){
-                    $('#datamy').text(data[0].d.starting_year);
                     b = data.map( function(x){ return x.d;});
                     console.log( b[0]);
 
                     new Morris.Line({
                         element: 'myfirstchart',
                         data: b,
-                        xkey: 'starting_year' ,
+                        xkey: 'starting_year',
                         ykeys: [ 'roi' ],
                         labels: ['Roi']
                     });
@@ -46,4 +33,3 @@
 </script>
 
 
-<div id="datamy"></div>

@@ -8,34 +8,36 @@ from flask import Flask
 app = Flask(__name__)
 
 
-results_cache = []
+d = a.AlphavantageData()
 
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
 
-@app.route('/chart')
+@app.route('/default_chart')
 def chart():
     return render_template('chart.html')
 
 @app.route('/dca_roi_chart')
 def dca_roi_chart():
+    print('/dca_roi_chart')
     return render_template('cost_returns_chart.html')
 
-@app.route('/dca_roi_data')
-def dca_roi_data():
-    return results_cache[0]
+@app.route('/data/<scrip>/<int:amount>')
+def dca_roi_data(scrip,amount):
+
+    d.load( scrip)
+    b = a.simulation( d, scrip=scrip,amount=amount)
+    for i in b:
+        i.d['starting_year'] = i.get('starting_year').split('_')[0] + '-' +  i.get('starting_year').split('_')[1]
+    _json =  json.dumps(b,default=lambda o: o.__dict__)
+    return _json
+
 
 @app.route('/dca/<scrip>/<int:amount>')
 def get_dca(scrip,amount):
-
-    d = a.AlphavantageData()
     d.load( scrip)
     b = a.simulation( d, scrip=scrip,amount=amount)
-
-
-    _json =  json.dumps(b,default=lambda o: o.__dict__)
-    results_cache.append( _json)
 
     header  =  "Rs.{}/- per month, starting {}, for {} months ".format(
         b[0].get('amount'),

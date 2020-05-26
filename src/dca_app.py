@@ -9,28 +9,31 @@ app = Flask(__name__)
 
 
 d = a.AlphavantageData()
+cache = {}
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
-
-@app.route('/default_chart')
-def chart():
-    return render_template('chart.html')
-
-@app.route('/dca_roi_chart')
+@app.route('/chart')
 def dca_roi_chart():
-    print('/dca_roi_chart')
     return render_template('cost_returns_chart.html')
 
-@app.route('/data/<scrip>/<int:amount>')
-def dca_roi_data(scrip,amount):
+
+@app.route('/data/')
+def dca_roi_data():
+
+    scrip='RELIANCE.NS'
+    amount=10000
+
+    if scrip in cache:
+        return cache[scrip]
 
     d.load( scrip)
     b = a.simulation( d, scrip=scrip,amount=amount)
-    for i in b:
-        i.d['starting_year'] = i.get('starting_year').split('_')[0] + '-' +  i.get('starting_year').split('_')[1]
-    _json =  json.dumps(b,default=lambda o: o.__dict__)
+
+    c = [x.d for x in b]
+    for i in c:
+        i['starting_year'] = i['starting_year'].split('_')[0] + '-' +  i['starting_year'].split('_')[1]
+        i['price'] = i['ledger'][0].price
+    _json =  json.dumps( c, default=lambda o: o.__dict__)
+    cache[scrip] = _json
     return _json
 
 

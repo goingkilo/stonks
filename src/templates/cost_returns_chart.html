@@ -13,9 +13,11 @@
 
         function f(){
             jQuery.getJSON(
-                '/data/RELIANCE.NS/10000',
+                '/data',
                 function(data){
-                    b = data.map( function(x){ return x.d;});
+
+                    //b = data.map( function(x){ return x.d;});
+                    b = data;
                     console.log( b[0]);
 
                     new Morris.Line({
@@ -23,7 +25,7 @@
                         data: b,
                         xkey: 'starting_year',
                         ykeys: [ 'roi' ],
-                        labels: ['Roi']
+                        labels: ['Roi' ]
                     });
                 }
             );

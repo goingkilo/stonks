@@ -1,3 +1,5 @@
+release : mar 10 2021
+
 1. historical data
  1.1 transactions
 2. dca simulations
